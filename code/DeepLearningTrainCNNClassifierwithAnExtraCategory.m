@@ -54,10 +54,12 @@
 
 % Download CIFAR-10 data to a temporary directory
 cifar10Data = tempdir;
-
 url = 'https://www.cs.toronto.edu/~kriz/cifar-10-matlab.tar.gz';
-
 helperCIFAR10Data.download(url, cifar10Data);
+
+% Note: the above download may not work in MATLAB 2017b. If that is the
+% case, you may manually download the cifar10 data from the above url, and
+% place it in cifar10Data folder, e.g.cifar10Data = './';
 
 % Load the CIFAR-10 training and test data.
 [trainingImages, trainingLabels, testImages, testLabels] = helperCIFAR10Data.load(cifar10Data);
