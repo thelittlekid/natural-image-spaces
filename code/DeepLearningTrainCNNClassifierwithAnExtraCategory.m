@@ -66,11 +66,37 @@ helperCIFAR10Data.download(url, cifar10Data);
 
 % Add random noise as a new category in the training data
 % You can control the amount by changing the rate (1x = 5000 samples)
-noiseAmount = 5000 * 1; 
-noiseImages = uint8(randi([0 255], 32, 32, 3, noiseAmount));
-trainingImages = cat(4, trainingImages, noiseImages);
-noiseLabels = categorical(repmat({'noise'}, noiseAmount, 1));
-trainingLabels = cat(1, trainingLabels, noiseLabels);
+% noiseAmount = 5000 * 1; 
+% noiseImages = uint8(randi([0 255], 32, 32, 3, noiseAmount));
+% trainingImages = cat(4, trainingImages, noiseImages);
+% noiseLabels = categorical(repmat({'noise'}, noiseAmount, 1));
+% trainingLabels = cat(1, trainingLabels, noiseLabels);
+
+% Add solid color as an additional category
+% solidAmount = 5000*1;
+% solidColors = uint8(randi([0 255], 3, solidAmount));
+% solidImages = uint8(zeros(32, 32, 3, solidAmount));
+% for i = 1:solidAmount
+%     redChannel = repmat(solidColors(1, i), 32, 32);
+%     greenChannel = repmat(solidColors(2, i), 32, 32);
+%     blueChannel = repmat(solidColors(3, i), 32, 32);
+%     solidImages(:,:,:,i) = cat(3, redChannel, greenChannel, blueChannel);
+% end
+% trainingImages = cat(4, trainingImages, solidImages);
+% solidLabels = categorical(repmat({'solid'}, solidAmount, 1));
+% trainingLabels = cat(1, trainingLabels, solidLabels);
+
+% Add grayscale image as an additional category
+grayAmount = 5000 * 1;
+grayColors = uint8(randi([0 255], grayAmount));
+grayImages = uint8(zeros(32, 32, 3, grayAmount));
+for i = 1:grayAmount
+    grayImages(:,:,:,i) = grayColors(i);
+end
+trainingImages = cat(4, trainingImages, grayImages);
+grayLabels = categorical(repmat({'gray'}, grayAmount, 1));
+trainingLabels = cat(1, trainingLabels, grayLabels);
+
 % % % TODO: Permutation
 
 %%
