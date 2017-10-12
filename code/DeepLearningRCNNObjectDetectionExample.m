@@ -62,7 +62,7 @@ size(trainingImages)
 
 %%
 % CIFAR-10 has 10 image categories. List the image categories:
-numImageCategories = 10;
+numImageCategories = 11;
 categories(trainingLabels)
 
 %%

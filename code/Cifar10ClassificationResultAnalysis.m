@@ -28,7 +28,7 @@ count_same = 0; % number of correctly classified samples
 % Robust measurements
 confidence = 0; % confidence on correctly classified samples
 dist_groundtruth_bound = 0; % distanlce to the nearest boundary
-prob_groundtruth = 0; % misclassified sample's probability for ground truth category
+prob_groundtruth = 0; % probability for ground truth category when misclassified
 mislead = 0; % confidence on the misclassification
 
 for i = 1:length(testLabels)
@@ -41,7 +41,7 @@ for i = 1:length(testLabels)
         count_diff = count_diff + 1;
         % Get the ground truth label and calculate the distance to that
         % boundary
-        idx = find(ismember(categoryName, char(testLabels(i))));
+        idx = ismember(categoryName, char(testLabels(i)));
         prob_groundtruth = prob_groundtruth + feature(idx);
         mislead = mislead + max(feature);
     else

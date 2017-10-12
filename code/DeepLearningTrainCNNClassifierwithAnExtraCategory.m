@@ -66,11 +66,11 @@ helperCIFAR10Data.download(url, cifar10Data);
 
 % Add random noise as a new category in the training data
 % You can control the amount by changing the rate (1x = 5000 samples)
-% noiseAmount = 5000 * 1; 
-% noiseImages = uint8(randi([0 255], 32, 32, 3, noiseAmount));
-% trainingImages = cat(4, trainingImages, noiseImages);
-% noiseLabels = categorical(repmat({'noise'}, noiseAmount, 1));
-% trainingLabels = cat(1, trainingLabels, noiseLabels);
+noiseAmount = 5000 * 4; 
+noiseImages = uint8(randi([0 255], 32, 32, 3, noiseAmount));
+trainingImages = cat(4, trainingImages, noiseImages);
+noiseLabels = categorical(repmat({'noise'}, noiseAmount, 1));
+trainingLabels = cat(1, trainingLabels, noiseLabels);
 
 % Add solid color as an additional category
 % solidAmount = 5000*1;
@@ -87,15 +87,15 @@ helperCIFAR10Data.download(url, cifar10Data);
 % trainingLabels = cat(1, trainingLabels, solidLabels);
 
 % Add grayscale image as an additional category
-grayAmount = 5000 * 1;
-grayColors = uint8(randi([0 255], grayAmount));
-grayImages = uint8(zeros(32, 32, 3, grayAmount));
-for i = 1:grayAmount
-    grayImages(:,:,:,i) = grayColors(i);
-end
-trainingImages = cat(4, trainingImages, grayImages);
-grayLabels = categorical(repmat({'gray'}, grayAmount, 1));
-trainingLabels = cat(1, trainingLabels, grayLabels);
+% grayAmount = 5000 * 1;
+% grayColors = uint8(randi([0 255], grayAmount));
+% grayImages = uint8(zeros(32, 32, 3, grayAmount));
+% for i = 1:grayAmount
+%     grayImages(:,:,:,i) = grayColors(i);
+% end
+% trainingImages = cat(4, trainingImages, grayImages);
+% grayLabels = categorical(repmat({'gray'}, grayAmount, 1));
+% trainingLabels = cat(1, trainingLabels, grayLabels);
 
 % % % TODO: Permutation
 
@@ -266,7 +266,12 @@ opts = trainingOptions('sgdm', ...
     'Verbose', true);
 
 %% Train and test the accuracy for 50 times
-accuracies = [];
+accuracies = []; 
+confidences = []; % expected confidence for correctly classified samples
+misleads = []; % expected misleading probability for misclassified samples
+prob_groundtruths = []; % probability for ground truth category when misclassified
+noise_counts = []; % number of test samples that are misclassified to the extra category
+
 for i = 1:50
     i
     %%
@@ -325,13 +330,29 @@ for i = 1:50
     YTest = classify(cifar10Net, testImages);
     
     % Calculate the accuracy.
-    accuracy = sum(YTest == testLabels)/numel(testLabels)
-    
+    accuracy = sum(YTest == testLabels)/numel(testLabels)    
     accuracies = [accuracies, accuracy];
+    
+    % Calculate confidence and misleads, and prob_groundtruth
+    [confidence, mislead, prob_groundtruth] = ...
+        calculate_robustness_measurements(testImages, cifar10Net, YTest, testLabels);
+    confidences = [confidences, confidence];
+    misleads = [misleads, mislead];
+    prob_groundtruths = [prob_groundtruths, prob_groundtruth];
+    
+    % Check if any test samples are misclassified as the extra category
+    noise_count = sum(ismember(YTest, 'noise'));
+    noise_counts = [noise_counts, noise_count];
 end
 
-mean(accuracies)
-std(accuracies)
+disp("Average Test Accuray: " + mean(accuracies));
+disp("Standard Deviation of Test Accuracy: " + std(accuracies));
+disp("Average Confidence for Correctly Classified Samples: " + mean(confidence));
+disp("Average Misleading Probability for Misclassified Samples: " + mean(misleads));
+disp("Average Probability of Ground Truth Category for Misclassified Samples: " ...
+    + mean(prob_groundtruths));
+disp("Expected number of samples that are misclassified to the extra category: " ...
+     + mean(noise_counts));
 %%
 % Further training will improve the accuracy, but that is not necessary for
 % the purpose of training the R-CNN object detector.
