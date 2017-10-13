@@ -64,13 +64,14 @@ helperCIFAR10Data.download(url, cifar10Data);
 % Load the CIFAR-10 training and test data.
 [trainingImages, trainingLabels, testImages, testLabels] = helperCIFAR10Data.load(cifar10Data);
 
+%% Add additional training samples
 % Add random noise as a new category in the training data
 % You can control the amount by changing the rate (1x = 5000 samples)
-noiseAmount = 5000 * 4; 
-noiseImages = uint8(randi([0 255], 32, 32, 3, noiseAmount));
-trainingImages = cat(4, trainingImages, noiseImages);
-noiseLabels = categorical(repmat({'noise'}, noiseAmount, 1));
-trainingLabels = cat(1, trainingLabels, noiseLabels);
+% noiseAmount = 5000 * 4; 
+% noiseImages = uint8(randi([0 255], 32, 32, 3, noiseAmount));
+% trainingImages = cat(4, trainingImages, noiseImages);
+% noiseLabels = categorical(repmat({'noise'}, noiseAmount, 1));
+% trainingLabels = cat(1, trainingLabels, noiseLabels);
 
 % Add solid color as an additional category
 % solidAmount = 5000*1;
@@ -104,9 +105,43 @@ trainingLabels = cat(1, trainingLabels, noiseLabels);
 size(trainingImages)
 
 %%
+% Select a subset of training samples to train the network
+result_folder = '../result/';
+addpath(result_folder);
+load('retrain_indices.mat');
+
+casenum = 3;
+switch casenum
+    case 1
+        % low-low
+        trainingImages = trainingImages(:,:,:,...
+            [correct_lowconfidence_indices; incorrect_lowmislead_indices]); 
+        trainingLabels = trainingLabels(...
+            [correct_lowconfidence_indices; incorrect_lowmislead_indices]); 
+    case 2
+        % high-low
+        trainingImages = trainingImages(:,:,:,...
+            [correct_highconfidence_indices; incorrect_lowmislead_indices]);
+        trainingLabels = trainingLabels(...
+            [correct_highconfidence_indices; incorrect_lowmislead_indices]);
+    case 3
+        % low-high
+        trainingImages = trainingImages(:,:,:,...
+            [correct_lowconfidence_indices; incorrect_highmislead_indices]); 
+        trainingLabels = trainingLabels(...
+            [correct_lowconfidence_indices; incorrect_highmislead_indices]);
+    case 4
+        % high-high
+        trainingImages = trainingImages(:,:,:,...
+            [correct_highconfidence_indices; incorrect_highmislead_indices]); 
+        trainingLabels = trainingLabels(...
+            [correct_highconfidence_indices; incorrect_highmislead_indices]);
+end
+
+%%
 % CIFAR-10 has 10 image categories. List the image categories:
 % We add an additional category of random noise
-numImageCategories = 11;
+numImageCategories = 10;
 categories(trainingLabels)
 
 %%
