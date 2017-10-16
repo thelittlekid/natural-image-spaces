@@ -1,9 +1,12 @@
-%% Retrain Cifar10 deep network with selected data from training set
+%% Select subgroups of training data to retrain the network
 % Retrain the network with samples that are far from the decision
 % boundaries and those that are close to the decision boundaries, to see
 % the impact of training samples on test accuracy.
 % We assume that the probability in softmax layer is correlated to the
 % distance to decision boundaries. 
+% This script does the first step, that is, to select groups of training
+% samples. You have to rerun the training process using: 
+%   DeepLearningTrainCNNClassifierwithAnExtraCategory.m
 % This might seem to be a little unorthodox, as the distance can be
 % obtained only after one complete training process, it can't help the
 % training process after all. The key idea here is to illustrate that the
