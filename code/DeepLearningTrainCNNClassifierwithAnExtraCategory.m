@@ -67,11 +67,26 @@ helperCIFAR10Data.download(url, cifar10Data);
 %% Add additional training samples
 % Add random noise as a new category in the training data
 % You can control the amount by changing the rate (1x = 5000 samples)
-% noiseAmount = 5000 * 4; 
+noiseAmount = 5000 * 5; 
+% Select one type of random noise
+% 1. uniformly distributed 
 % noiseImages = uint8(randi([0 255], 32, 32, 3, noiseAmount));
-% trainingImages = cat(4, trainingImages, noiseImages);
-% noiseLabels = categorical(repmat({'noise'}, noiseAmount, 1));
-% trainingLabels = cat(1, trainingLabels, noiseLabels);
+% uniformly distributed on cropped region
+% mu = 127; sigma = 90;
+% noiseImages = uint8(sigma.*rand(32, 32, 3, noiseAmount) + mu);
+% 2. Gaussian 
+% mu = 127; sigma = 70;
+% noiseImages = uint8(sigma.*randn(32, 32, 3, noiseAmount) + mu);
+% 3. mixed Gaussian noise
+shape = [32, 32, 3, noiseAmount];
+mus = 127; sigmas = 70;
+scorrs = repmat(7, 2, 1);
+filtermode = 0;
+noiseImages = generate_mixed_gaussian_noise(shape, mus, sigmas, scorrs, filtermode);
+
+trainingImages = cat(4, trainingImages, noiseImages);
+noiseLabels = categorical(repmat({'noise'}, noiseAmount, 1));
+trainingLabels = cat(1, trainingLabels, noiseLabels);
 
 % Add solid color as an additional category
 % solidAmount = 5000*1;
@@ -106,42 +121,42 @@ size(trainingImages)
 
 %%
 % Select a subset of training samples to train the network
-result_folder = '../result/';
-addpath(result_folder);
-load('retrain_indices.mat');
-
-casenum = 3;
-switch casenum
-    case 1
-        % low-low
-        trainingImages = trainingImages(:,:,:,...
-            [correct_lowconfidence_indices; incorrect_lowmislead_indices]); 
-        trainingLabels = trainingLabels(...
-            [correct_lowconfidence_indices; incorrect_lowmislead_indices]); 
-    case 2
-        % high-low
-        trainingImages = trainingImages(:,:,:,...
-            [correct_highconfidence_indices; incorrect_lowmislead_indices]);
-        trainingLabels = trainingLabels(...
-            [correct_highconfidence_indices; incorrect_lowmislead_indices]);
-    case 3
-        % low-high
-        trainingImages = trainingImages(:,:,:,...
-            [correct_lowconfidence_indices; incorrect_highmislead_indices]); 
-        trainingLabels = trainingLabels(...
-            [correct_lowconfidence_indices; incorrect_highmislead_indices]);
-    case 4
-        % high-high
-        trainingImages = trainingImages(:,:,:,...
-            [correct_highconfidence_indices; incorrect_highmislead_indices]); 
-        trainingLabels = trainingLabels(...
-            [correct_highconfidence_indices; incorrect_highmislead_indices]);
-end
+% result_folder = '../result/';
+% addpath(result_folder);
+% load('retrain_indices.mat');
+% 
+% casenum = 3;
+% switch casenum
+%     case 1
+%         % low-low
+%         trainingImages = trainingImages(:,:,:,...
+%             [correct_lowconfidence_indices; incorrect_lowmislead_indices]); 
+%         trainingLabels = trainingLabels(...
+%             [correct_lowconfidence_indices; incorrect_lowmislead_indices]); 
+%     case 2
+%         % high-low
+%         trainingImages = trainingImages(:,:,:,...
+%             [correct_highconfidence_indices; incorrect_lowmislead_indices]);
+%         trainingLabels = trainingLabels(...
+%             [correct_highconfidence_indices; incorrect_lowmislead_indices]);
+%     case 3
+%         % low-high
+%         trainingImages = trainingImages(:,:,:,...
+%             [correct_lowconfidence_indices; incorrect_highmislead_indices]); 
+%         trainingLabels = trainingLabels(...
+%             [correct_lowconfidence_indices; incorrect_highmislead_indices]);
+%     case 4
+%         % high-high
+%         trainingImages = trainingImages(:,:,:,...
+%             [correct_highconfidence_indices; incorrect_highmislead_indices]); 
+%         trainingLabels = trainingLabels(...
+%             [correct_highconfidence_indices; incorrect_highmislead_indices]);
+% end
 
 %%
 % CIFAR-10 has 10 image categories. List the image categories:
 % We add an additional category of random noise
-numImageCategories = 10;
+numImageCategories = 11;
 categories(trainingLabels)
 
 %%
