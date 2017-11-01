@@ -55,7 +55,7 @@ end
 
 %% Sort and select a subset of trianing samples for retraining 
 % Obtain the training samples that are categorized with high/low probabilities
-percentage = 0.5; % percentage of training samples that will be used for retraining
+percentage = 0.75; % percentage of training samples that will be used for retraining
 if percentage < 0 || percentage > 1
     error('percentage must between 0 and 1');
 end
@@ -73,6 +73,6 @@ correct_highconfidence_indices = correct_confidence_indices(end-correct_num+1:en
 incorrect_lowmislead_indices = incorrect_mislead_indices(1:incorrect_num);
 incorrect_highmislead_indices = incorrect_mislead_indices(end-incorrect_num+1:end);
 
-save([result_folder, 'retrain_indices.mat'], ...
+save([result_folder, 'retrain_indices_75.mat'], ...
     'correct_highconfidence_indices', 'correct_lowconfidence_indices', ...
     'incorrect_lowmislead_indices', 'incorrect_highmislead_indices');
