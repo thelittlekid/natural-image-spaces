@@ -70,7 +70,7 @@ helperCIFAR10Data.download(url, cifar10Data);
 % addpath(result_folder);
 % load('retrain_indices_75.mat');
 % 
-% casenum = 2;
+% casenum = 4;
 % switch casenum
 %     case 1
 %         % low-low
@@ -101,22 +101,22 @@ helperCIFAR10Data.download(url, cifar10Data);
 %% Add additional training samples
 % Add random noise as a new category in the training data
 % You can control the amount by changing the rate (1x = 5000 samples)
-noiseAmount = 5000 * 20; 
+noiseAmount = 5000 * 5; 
 % Select one type of random noise
 % 1. uniformly distributed 
 % noiseImages = uint8(randi([0 255], 32, 32, 3, noiseAmount));
 % uniformly distributed on cropped region
-mu = 127; sigma = 50;
-noiseImages = uint8(sigma.*rand(32, 32, 3, noiseAmount) + mu);
+% mu = 127; sigma = 50;
+% noiseImages = uint8(sigma.*rand(32, 32, 3, noiseAmount) + mu);
 % 2. Gaussian 
-% mu = 127; sigma = 70;
+% mu = 31; sigma = 70;
 % noiseImages = uint8(sigma.*randn(32, 32, 3, noiseAmount) + mu);
 % 3. mixed Gaussian noise
-% shape = [32, 32, 3, noiseAmount];
-% mus = 64:32:192; sigmas = 32;
-% scorrs = repmat(1, 2, 1);
-% filtermode = 0;
-% noiseImages = generate_mixed_gaussian_noise(shape, mus, sigmas, scorrs, filtermode);
+shape = [32, 32, 3, noiseAmount];
+mus = 127; sigmas = inf;
+scorrs = repmat(5, 2, 1);
+filtermode = 0;
+noiseImages = generate_mixed_gaussian_noise(shape, mus, sigmas, scorrs, filtermode);
 
 trainingImages = cat(4, trainingImages, noiseImages);
 noiseLabels = categorical(repmat({'noise'}, noiseAmount, 1));
@@ -399,7 +399,7 @@ for i = 1:50
     noise_counts = [noise_counts, noise_count];
 end
 
-disp("Average Test Accuray: " + mean(accuracies));
+disp("Average Test Accuracy: " + mean(accuracies));
 disp("Standard Deviation of Test Accuracy: " + std(accuracies));
 disp("Average Confidence for Correctly Classified Samples: " + mean(confidence));
 disp("Average Misleading Probability for Misclassified Samples: " + mean(misleads));

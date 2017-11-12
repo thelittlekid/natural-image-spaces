@@ -19,7 +19,12 @@ function [noiseImages] = generate_gaussian_noise(shape, mu, sigma, ...
 %
 % Author: Yifei Fan (yifei@gatech.edu)
 
-noiseImages = uint8(mu + sigma * randn(shape));
+if (sigma == inf)
+    noiseImages = uint8(randi([0, 255], shape)); % uniformly distributed
+else
+    noiseImages = uint8(mu + sigma * randn(shape));
+end
+
 noiseAmount = shape(end);
 
 if(isequal(scorr, [1; 1])) 
