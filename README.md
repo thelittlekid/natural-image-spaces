@@ -1,2 +1,2 @@
 # neural-network-in-image-space
-Experiments for "Towards Understanding Neural Networks in Image Space"
+Experiments for "Towards an Understanding of Neural Networks in Natural-Image Spaces"
